@@ -27,9 +27,6 @@ const Denuncias = db.define(
     flag_miembro_comite: {
       type: DataTypes.TINYINT,
     },
-    miembro_comite: {
-      type: DataTypes.STRING,
-    },
     prueba_url: {
       type: DataTypes.STRING,
     },
