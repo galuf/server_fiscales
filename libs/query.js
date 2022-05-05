@@ -17,6 +17,18 @@ const query = {
   from presuntos_miembros 
   group by departamento, provincia, distrito
   order by conteo_lugar desc`,
+  all: `with presuntos_ubicacion as (
+    select pr.*, ic.departamento, ic.provincia, ic.distrito  from public.presuntos_responsables pr 
+    left join public.informes_control ic on pr.num_inform = ic.num_inform
+  ), presuntos_ubicacion_unicos as (
+    select fullname , departamento, provincia, distrito, count(*) conteo
+    from presuntos_ubicacion
+    group by fullname , departamento, provincia, distrito
+  ) -- se borra miembros_comite_unicos y presuntos_miembros
+  select departamento, provincia, distrito, count(*) conteo_lugar
+  from presuntos_ubicacion_unicos 
+  group by departamento, provincia, distrito
+  order by conteo_lugar desc;`,
 };
 
 module.exports = {
