@@ -9,6 +9,7 @@ class Server {
 
     this.paths = {
       usuarios: "/api/miembros",
+      denuncias: "/api/denuncias",
     };
 
     //Conectar a la base de datos
@@ -41,6 +42,7 @@ class Server {
 
   routes() {
     this.app.use(this.paths.usuarios, require("../routes/usuarios"));
+    this.app.use(this.paths.denuncias, require("../routes/denuncias"));
   }
 
   listen() {
