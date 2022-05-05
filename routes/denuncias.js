@@ -4,6 +4,6 @@ const { postDenuncias } = require("../controllers/denuncias");
 
 const router = Router();
 
-router.get("/create", postDenuncias);
+router.post("/create", postDenuncias);
 
 module.exports = router;
