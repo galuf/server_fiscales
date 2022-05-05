@@ -8,7 +8,7 @@ class Server {
     this.port = process.env.PORT;
 
     this.paths = {
-      usuarios: "/api/usuarios",
+      usuarios: "/api/miembros",
     };
 
     //Conectar a la base de datos
@@ -22,17 +22,17 @@ class Server {
   }
 
   async conectarDB() {
-    try{
+    try {
       await db.authenticate();
-      console.log('Database online')
-    }catch (error){
-      throw new Error (error)
+      console.log("Database online");
+    } catch (error) {
+      throw new Error(error);
     }
   }
 
   middlewares() {
     //CORS
-    this.app.use( cors() );
+    this.app.use(cors());
     //Lectura y parseo del Body
     this.app.use(express.json());
     //Directorio Publico
