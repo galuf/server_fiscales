@@ -2,7 +2,7 @@ const { groupBy } = require("../libs/helper");
 const { db } = require("../database/config");
 
 const miembrosAcusados = async (req, res) => {
-  const { groupBy: g } = req.query;
+  const { groupBy: g, page, limit, sortBy } = req.query;
   let query = `with presuntos_ubicacion as (
     select pr.*, ic.departamento, ic.provincia, ic.distrito  from public.presuntos_responsables pr 
     left join public.informes_control ic on pr.num_inform = ic.num_inform
@@ -26,7 +26,7 @@ const miembrosAcusados = async (req, res) => {
   //const conteoDep = results.reduce(a, suma, 0);
   const resultGroupByDepartment = groupBy(results, g);
 
-  //console.log(resultGroupByDepartment);
+  //const limit = parseInt(pageLimit, 10) || 10;
 
   //console.log(metadata);
   res.json({
