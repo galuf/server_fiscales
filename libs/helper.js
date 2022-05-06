@@ -6,26 +6,27 @@ const groupBy = function (xs, key) {
 };
 
 const paginator = function (res, page, limit, search, sortBy, order = "desc") {
-  const total = res.lenght;
+  const total = res.length;
   const paginas = parseInt(total / limit);
-  let resSort;
-  if ((order = "asc")) {
-    resSort = res.sort((a, b) => {
-      Number(b[sortBy]) - Number(a[sortBy]);
+
+  if (order == "desc") {
+    res.sort((a, b) => {
+      return b[sortBy] - a[sortBy];
     });
   } else {
-    let resSort = res.sort((a, b) => {
-      Number(a[sortBy]) - Number(b[sortBy]);
+    res.sort((a, b) => {
+      return a[sortBy] - b[sortBy];
     });
   }
+  //console.log("resSort", res)
   const inicio = (page - 1) * limit;
   const final = page * limit > total ? total : page * limit;
   return {
-    totalDocs: total,
+    totalDocs: final  - inicio,
     hasNextPage: page >= paginas ? false : true,
     hasPrevPage: page == 1 ? false : true,
     page,
-    result: resSort.slice(inicio, final),
+    result: res.slice(inicio, final),
   };
 };
 
