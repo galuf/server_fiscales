@@ -4,6 +4,7 @@ const { db } = require("../database/config");
 const { executePagination } = require("../libs/pagination");
 const { groupBy } = require("../libs/helper");
 const { keyBy } = require("lodash");
+const PresuntosQueries = require("../libs/queries/presuntos");
 
 const resolveConvocatorias = async (convocatorias) => {
   const convocatoriaIds = convocatorias.map((convocatoria) => convocatoria.codigo_convocatoria);
@@ -22,8 +23,14 @@ const resolveConvocatorias = async (convocatorias) => {
 
 const resolveMembers = async (members) => {
   const queryConvocatorias = ConvocatoriasQueries.convocatoriaBasicByMemberNames(members.map((member) => member.fullname));
+  const queryInformes = PresuntosQueries.presuntosByNames(members.map((member) => member.fullname))
 
-  const [ convocatoriaResults ] = await db.query(queryConvocatorias);
+  const [[ convocatoriaResults ], [informeResults]] = await Promise.all([
+    db.query(queryConvocatorias),
+    db.query(queryInformes),
+  ]);
+
+  const informesGroupBy = groupBy(informeResults, 'fullname');
   
   const convocatoriasFull = await resolveConvocatorias(convocatoriaResults)
 
@@ -33,6 +40,7 @@ const resolveMembers = async (members) => {
     ...member,
     convocatorias: convocatoriaResultsGroupBy[member.fullname] ?? [],
     totalConvocatorias: convocatoriaResultsGroupBy[member.fullname]?.length ?? 0,
+    informes: informesGroupBy[member.fullname] ?? [],
   }))
 }
 
