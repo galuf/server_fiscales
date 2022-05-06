@@ -67,7 +67,8 @@ const query = {
     coalesce (conteo_acusacion, 0) conteo_acusacion
     from miembros_sobrecarga_infoacusacion
   )
-  select * from clean_miembros_infoacusacion cmi order by conteo_acusacion desc;`,
+  select * from clean_miembros_infoacusacion cmi
+  order by conteo_convocatorias desc limit 20;`,
 };
 
 module.exports = {
