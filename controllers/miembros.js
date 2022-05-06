@@ -1,6 +1,21 @@
 const { query } = require("../libs/query");
 const { db } = require("../database/config");
 const { executePagination } = require("../libs/pagination");
+const { groupBy } = require("../libs/helper");
+
+const resolveMembers = async (members) => {
+  const queryConvocatorias = query.convocatoriasByMemberNames(members.map((member) => member.fullname));
+
+  const [ convocatoriaResults ] = await db.query(queryConvocatorias);
+
+  const convocatoriaResultsGroupBy = groupBy(convocatoriaResults, 'miembro_comite')
+
+  return members.map((member) => ({
+    ...member,
+    convocatorias: convocatoriaResultsGroupBy[member.fullname] ?? [],
+    totalConvocatorias: convocatoriaResultsGroupBy[member.fullname]?.length ?? 0,
+  }))
+}
 
 const getMemberBySearch = async (req, res) => {
   try {
@@ -21,11 +36,13 @@ const getMemberBySearch = async (req, res) => {
       sortBy,
     })
 
+    const _docs = await resolveMembers(docs)
+
     res.json({
       success: true,
       data: {
         info,
-        docs
+        docs: _docs
       }
     })
   } catch (error) {

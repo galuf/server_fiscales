@@ -84,6 +84,19 @@ const query = {
     from miembros_sobrecarga_infoacusacion
   )
   select * from clean_miembros_infoacusacion cmi order by conteo_acusacion desc;`,
+  convocatoriasByMemberNames: (names) => {
+    return `
+      select 
+        *
+      from 
+        public.miembros_comite_seleccion mcs 
+      where 
+        miembro_comite = any('{${names.map((name) => `${name}`).join(',')}}')
+      order by
+        year_convocatoria 
+      desc 
+    `
+  }
 };
 
 module.exports = {
