@@ -11,7 +11,8 @@ class Server {
       lugar: "/api/acusados_lugar",
       denuncias: "/api/denuncias",
       miembros: "/api/miembros",
-      funcionarios: "/api/funcionarios"
+      funcionarios: "/api/funcionarios",
+      entidades: "/api/acusados_entidades",
     };
 
     //Conectar a la base de datos
@@ -46,7 +47,8 @@ class Server {
     this.app.use(this.paths.lugar, require("../routes/lugar"));
     this.app.use(this.paths.denuncias, require("../routes/denuncias"));
     this.app.use(this.paths.miembros, require("../routes/miembros"));
-    this.app.use(this.paths.funcionarios,require("../routes/funcionarios"))
+    this.app.use(this.paths.funcionarios, require("../routes/funcionarios"));
+    this.app.use(this.paths.entidades, require("../routes/entidades"));
   }
 
   listen() {

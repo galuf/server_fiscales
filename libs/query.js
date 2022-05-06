@@ -43,7 +43,7 @@ const query = {
     group by
       dni,
       ${sortBy},
-      fullname`
+      fullname`;
   },
   sobrecarga: `with sobrecarga_comite_anual as (
     select 
@@ -83,7 +83,39 @@ const query = {
     coalesce (conteo_acusacion, 0) conteo_acusacion
     from miembros_sobrecarga_infoacusacion
   )
-  select * from clean_miembros_infoacusacion cmi order by conteo_acusacion desc;`,
+  select * from clean_miembros_infoacusacion cmi
+  order by conteo_convocatorias desc limit 20;`,
+  entidadMiembrosAcusados: `with presuntos_entidad as (
+    select pr.*, ic.entidad  from public.presuntos_responsables pr 
+    left join public.informes_control ic on pr.num_inform = ic.num_inform
+  ), presuntos_entidad_unicos as (
+    select fullname , entidad, count(*) conteo
+    from presuntos_entidad
+    group by fullname , entidad
+  ), miembros_comite_unicos as (
+    select * from (select distinct miembro_comite as nombre_miembro_comite from public.miembros_comite_seleccion) mcs
+  ), 
+  presuntos_miembros as (
+    select peu.*, mcu.nombre_miembro_comite from presuntos_entidad_unicos peu 
+    inner join miembros_comite_unicos mcu on peu.fullname = mcu.nombre_miembro_comite
+  )
+  select entidad, count(*) conteo_entidad
+  from presuntos_miembros 
+  group by entidad
+  order by conteo_entidad desc;
+  `,
+  allAcusadosEntidades: `with presuntos_entidad as (
+    select pr.*, ic.entidad  from public.presuntos_responsables pr 
+    left join public.informes_control ic on pr.num_inform = ic.num_inform
+  ), presuntos_entidad_unicos as (
+    select fullname , entidad, count(*) conteo
+    from presuntos_entidad
+    group by fullname , entidad
+  )
+  select entidad, count(*) conteo_entidad
+  from presuntos_entidad_unicos
+  group by entidad
+  order by conteo_entidad desc;`,
   convocatoriasByMemberNames: (names) => {
     return `
       select 
