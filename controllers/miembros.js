@@ -38,8 +38,6 @@ const resolveMembers = async (members) => {
 
   const convocatoriaResultsGroupBy = groupBy(convocatoriasFull, 'miembro_comite')
   
-  
-
   return members.map((member) => {
     const presuntos = presuntosGroupBy[member.fullname] ?? []
 
