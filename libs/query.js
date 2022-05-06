@@ -67,9 +67,7 @@ const query = {
     coalesce (conteo_acusacion, 0) conteo_acusacion
     from miembros_sobrecarga_infoacusacion
   )
-  select * from clean_miembros_infoacusacion cmi
-  where cmi.nombre_persona_evaluada = 'AMARU LOPEZ BENAVIDES'
-  ;`
+  select * from clean_miembros_infoacusacion cmi order by conteo_acusacion desc;`,
 };
 
 module.exports = {
