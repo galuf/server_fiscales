@@ -29,6 +29,22 @@ const query = {
   from presuntos_ubicacion_unicos 
   group by departamento, provincia, distrito
   order by conteo_lugar desc;`,
+  getMemberBySearch: ({ sortBy, search }) => {
+    return `select
+      dni,
+      ${sortBy},
+      fullname,
+      count(*) total_${sortBy}
+    from
+      public.presuntos_responsables
+    where 
+      ${sortBy} = true and 
+      lower(fullname) ~ lower('${search}')
+    group by
+      dni,
+      ${sortBy},
+      fullname`
+  },
   sobrecarga: `with sobrecarga_comite_anual as (
     select 
     miembro_comite, year_convocatoria, count(*) conteo_convocatorias from public.miembros_comite_seleccion mcs 

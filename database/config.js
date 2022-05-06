@@ -2,7 +2,7 @@ const { Sequelize } = require("sequelize");
 
 // Heroku
 const db = new Sequelize(
-  "postgres://rytygopcfaquuh:e353c987e32aa069e92d9f6f02bb11042fabf8fbea2946524c625795f41bbb40@ec2-3-223-213-207.compute-1.amazonaws.com:5432/db6i2ulsptvsh6",
+  process.env.POSTGRES_CONNECTION,
   {
     logging: false,
     dialectOptions: {
