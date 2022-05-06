@@ -1,4 +1,3 @@
-const { query } = require("../libs/query");
 const ConvocatoriasQueries = require("../libs/queries/convocatorias");
 const MiembrosQueries = require("../libs/queries/miembros");
 const { db } = require("../database/config");
@@ -8,15 +7,12 @@ const { keyBy } = require("lodash");
 
 const resolveConvocatorias = async (convocatorias) => {
   const convocatoriaIds = convocatorias.map((convocatoria) => convocatoria.codigo_convocatoria);
-  console.log("Luis Sullca ~ file: miembros.js ~ line 11 ~ resolveConvocatorias ~ convocatoriaIds", convocatoriaIds)
 
   const queryConvocatorias = ConvocatoriasQueries.convocatoriasByIds(convocatoriaIds);
 
   const [ convocatoriaResults ] = await db.query(queryConvocatorias);
-  console.log("Luis Sullca ~ file: miembros.js ~ line 16 ~ resolveConvocatorias ~ convocatoriaResults", convocatoriaResults)
 
   const convocatoriaBy = keyBy(convocatoriaResults, 'codigo_convocatoria')
-  console.log("Luis Sullca ~ file: miembros.js ~ line 19 ~ resolveConvocatorias ~ convocatoriaBy", convocatoriaBy)
 
   return convocatorias.map((convocatoria) => ({
     ...convocatoria,
