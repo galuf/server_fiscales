@@ -21,27 +21,41 @@ const resolveConvocatorias = async (convocatorias) => {
   }))
 }
 
+const irregulars = [ "civil", "penal", "adm_ent", "adm_pas", "adm"]
+
 const resolveMembers = async (members) => {
   const queryConvocatorias = ConvocatoriasQueries.convocatoriaBasicByMemberNames(members.map((member) => member.fullname));
-  const queryInformes = PresuntosQueries.presuntosByNames(members.map((member) => member.fullname))
+  const queryPresuntos = PresuntosQueries.presuntosByNames(members.map((member) => member.fullname))
 
-  const [[ convocatoriaResults ], [informeResults]] = await Promise.all([
+  const [[ convocatoriaResults ], [presuntosResults]] = await Promise.all([
     db.query(queryConvocatorias),
-    db.query(queryInformes),
+    db.query(queryPresuntos),
   ]);
 
-  const informesGroupBy = groupBy(informeResults, 'fullname');
+  const presuntosGroupBy = groupBy(presuntosResults, 'fullname');
   
   const convocatoriasFull = await resolveConvocatorias(convocatoriaResults)
 
   const convocatoriaResultsGroupBy = groupBy(convocatoriasFull, 'miembro_comite')
+  
+  
 
-  return members.map((member) => ({
-    ...member,
-    convocatorias: convocatoriaResultsGroupBy[member.fullname] ?? [],
-    totalConvocatorias: convocatoriaResultsGroupBy[member.fullname]?.length ?? 0,
-    informes: informesGroupBy[member.fullname] ?? [],
-  }))
+  return members.map((member) => {
+    const presuntos = presuntosGroupBy[member.fullname] ?? []
+
+    return ({
+      ...member,
+      convocatorias: convocatoriaResultsGroupBy[member.fullname] ?? [],
+      totalConvocatorias: convocatoriaResultsGroupBy[member.fullname]?.length ?? 0,
+      presuntos: presuntosGroupBy[member.fullname] ?? [],
+      irregulars: irregulars.reduce((acc, irregularKey) => {
+        return ({
+          ...acc,
+          [irregularKey]: presuntos.filter((presunto) => presunto[irregularKey]).length
+        })
+      }, 0)
+    })
+  })
 }
 
 const getMemberBySearch = async (req, res) => {
