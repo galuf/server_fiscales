@@ -99,7 +99,43 @@ const query = {
   select entidad, count(*) conteo_entidad
   from presuntos_entidad_unicos
   group by entidad
-  order by conteo_entidad desc;`
+  order by conteo_entidad desc;`,
+  porcentajeAcusadosConvocatoria: `with sobrecarga_comite_anual as (
+    select 
+    miembro_comite, codigo_convocatoria , year_convocatoria  from public.miembros_comite_seleccion mcs 
+    group by miembro_comite, codigo_convocatoria, year_convocatoria
+  ), presuntos_anual_total as (
+    select pr.fullname, pr.civil, pr.penal, pr.adm_ent, pr.adm_pas, pr.adm,
+    extract(year from ic.fecha_emision) anio_implicado
+    from public.presuntos_responsables pr 
+    left join public.informes_control ic on pr.num_inform = ic.num_inform
+  ), presuntos_unicos_anual as (
+    select fullname, 
+    anio_implicado, count(*) conteo_acusacion
+    from presuntos_anual_total
+    where anio_implicado >= 2018
+    group by fullname,
+    anio_implicado
+  ), miembros_sobrecarga_infoacusacion as (
+    select *
+    from sobrecarga_comite_anual sca
+    left join presuntos_unicos_anual pua on sca.miembro_comite = pua.fullname and sca.year_convocatoria = pua.anio_implicado
+  ), clean_miembros_infoacusacion as (
+    select 
+    miembro_comite nombre_persona_evaluada,
+    codigo_convocatoria,
+    year_convocatoria anio,
+    coalesce (conteo_acusacion, 0) conteo_acusacion
+    from miembros_sobrecarga_infoacusacion
+  ), agrupacion_convocatoria_anio as (
+    select codigo_convocatoria, anio,
+    sum(conteo_acusacion) total_acusados, count(nombre_persona_evaluada) conteo_miembros,
+    cast(sum(conteo_acusacion) * 100 as decimal) / count(nombre_persona_evaluada) porcentaje_acusados_100
+    from clean_miembros_infoacusacion
+    group by codigo_convocatoria, anio
+  )
+  select * from agrupacion_convocatoria_anio cmi
+  ;`,
 };
 
 module.exports = {
