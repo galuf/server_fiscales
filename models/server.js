@@ -13,6 +13,7 @@ class Server {
       miembros: "/api/miembros",
       funcionarios: "/api/funcionarios",
       entidades: "/api/acusados_entidades",
+      convocatoria: "/api/convocatoria",
     };
 
     //Conectar a la base de datos
@@ -49,6 +50,7 @@ class Server {
     this.app.use(this.paths.miembros, require("../routes/miembros"));
     this.app.use(this.paths.funcionarios, require("../routes/funcionarios"));
     this.app.use(this.paths.entidades, require("../routes/entidades"));
+    this.app.use(this.paths.convocatoria, require("../routes/convocatoria"));
   }
 
   listen() {
