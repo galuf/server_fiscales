@@ -1,5 +1,5 @@
 const ConvocatoriasQueries = {
-  convocatoriasByMemberNames: (names) => {
+  convocatoriaBasicByMemberNames: (names) => {
     return `
       select 
         *
@@ -10,6 +10,16 @@ const ConvocatoriasQueries = {
       order by
         year_convocatoria 
       desc 
+    `
+  },
+  convocatoriasByIds: (convocatoriaIds) => {
+    return `
+      select 
+        *
+      from 
+        public.convocatorias_adjudicadas ca 
+      where 
+        codigo_convocatoria = any('{${convocatoriaIds.map((_id) => `${_id}`).join(',')}}')
     `
   }
 }

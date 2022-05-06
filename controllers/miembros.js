@@ -4,14 +4,34 @@ const MiembrosQueries = require("../libs/queries/miembros");
 const { db } = require("../database/config");
 const { executePagination } = require("../libs/pagination");
 const { groupBy } = require("../libs/helper");
+const { keyBy } = require("lodash");
 
+const resolveConvocatorias = async (convocatorias) => {
+  const convocatoriaIds = convocatorias.map((convocatoria) => convocatoria.codigo_convocatoria);
+  console.log("Luis Sullca ~ file: miembros.js ~ line 11 ~ resolveConvocatorias ~ convocatoriaIds", convocatoriaIds)
 
-const resolveMembers = async (members) => {
-  const queryConvocatorias = ConvocatoriasQueries.convocatoriasByMemberNames(members.map((member) => member.fullname));
+  const queryConvocatorias = ConvocatoriasQueries.convocatoriasByIds(convocatoriaIds);
 
   const [ convocatoriaResults ] = await db.query(queryConvocatorias);
+  console.log("Luis Sullca ~ file: miembros.js ~ line 16 ~ resolveConvocatorias ~ convocatoriaResults", convocatoriaResults)
 
-  const convocatoriaResultsGroupBy = groupBy(convocatoriaResults, 'miembro_comite')
+  const convocatoriaBy = keyBy(convocatoriaResults, 'codigo_convocatoria')
+  console.log("Luis Sullca ~ file: miembros.js ~ line 19 ~ resolveConvocatorias ~ convocatoriaBy", convocatoriaBy)
+
+  return convocatorias.map((convocatoria) => ({
+    ...convocatoria,
+    ...convocatoriaBy[convocatoria.codigo_convocatoria]
+  }))
+}
+
+const resolveMembers = async (members) => {
+  const queryConvocatorias = ConvocatoriasQueries.convocatoriaBasicByMemberNames(members.map((member) => member.fullname));
+
+  const [ convocatoriaResults ] = await db.query(queryConvocatorias);
+  
+  const convocatoriasFull = await resolveConvocatorias(convocatoriaResults)
+
+  const convocatoriaResultsGroupBy = groupBy(convocatoriasFull, 'miembro_comite')
 
   return members.map((member) => ({
     ...member,
