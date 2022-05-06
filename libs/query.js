@@ -29,22 +29,6 @@ const query = {
   from presuntos_ubicacion_unicos 
   group by departamento, provincia, distrito
   order by conteo_lugar desc;`,
-  getMemberBySearch: ({ sortBy, search }) => {
-    return `select
-      dni,
-      ${sortBy},
-      fullname,
-      count(*) total_${sortBy}
-    from
-      public.presuntos_responsables
-    where 
-      ${sortBy} = true and 
-      lower(fullname) ~ lower('${search}')
-    group by
-      dni,
-      ${sortBy},
-      fullname`;
-  },
   sobrecarga: `with sobrecarga_comite_anual as (
     select 
     miembro_comite, year_convocatoria, count(*) conteo_convocatorias from public.miembros_comite_seleccion mcs 
@@ -115,20 +99,7 @@ const query = {
   select entidad, count(*) conteo_entidad
   from presuntos_entidad_unicos
   group by entidad
-  order by conteo_entidad desc;`,
-  convocatoriasByMemberNames: (names) => {
-    return `
-      select 
-        *
-      from 
-        public.miembros_comite_seleccion mcs 
-      where 
-        miembro_comite = any('{${names.map((name) => `${name}`).join(',')}}')
-      order by
-        year_convocatoria 
-      desc 
-    `
-  }
+  order by conteo_entidad desc;`
 };
 
 module.exports = {

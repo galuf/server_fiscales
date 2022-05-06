@@ -1,10 +1,13 @@
 const { query } = require("../libs/query");
+const ConvocatoriasQueries = require("../libs/queries/convocatorias");
+const MiembrosQueries = require("../libs/queries/miembros");
 const { db } = require("../database/config");
 const { executePagination } = require("../libs/pagination");
 const { groupBy } = require("../libs/helper");
 
+
 const resolveMembers = async (members) => {
-  const queryConvocatorias = query.convocatoriasByMemberNames(members.map((member) => member.fullname));
+  const queryConvocatorias = ConvocatoriasQueries.convocatoriasByMemberNames(members.map((member) => member.fullname));
 
   const [ convocatoriaResults ] = await db.query(queryConvocatorias);
 
@@ -27,7 +30,7 @@ const getMemberBySearch = async (req, res) => {
     if(page <= 0) throw new Error("La página debe ser mayor a 0");
     if(limit <= 0) throw new Error("El limite debe ser mayor a 0");
 
-    const { docs, info } = await executePagination(query.getMemberBySearch({
+    const { docs, info } = await executePagination(MiembrosQueries.getMemberBySearch({
       sortBy,
       search
     }), {
