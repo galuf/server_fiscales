@@ -55,7 +55,10 @@ const getMemberBySearch = async (req, res) => {
       sortBy,
     })
 
-    const _docs = await resolveMembers(docs)
+    const _docs = await resolveMembers(docs.map((doc) => ({
+      ...doc,
+      [`total_${sortBy}`]: Number(doc[`total_${sortBy}`]),
+    })))
 
     res.json({
       success: true,
