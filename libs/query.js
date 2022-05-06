@@ -67,8 +67,7 @@ const query = {
     coalesce (conteo_acusacion, 0) conteo_acusacion
     from miembros_sobrecarga_infoacusacion
   )
-  select * from clean_miembros_infoacusacion cmi
-  order by conteo_convocatorias desc limit 20;`,
+  select * from clean_miembros_infoacusacion cmi`,
   entidadMiembrosAcusados: `with presuntos_entidad as (
     select pr.*, ic.entidad  from public.presuntos_responsables pr 
     left join public.informes_control ic on pr.num_inform = ic.num_inform

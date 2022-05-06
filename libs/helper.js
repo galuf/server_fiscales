@@ -1,3 +1,5 @@
+const { db } = require("../database/config");
+
 const groupBy = function (xs, key) {
   return xs.reduce(function (rv, x) {
     (rv[x[key]] = rv[x[key]] || []).push(x);
@@ -5,32 +7,53 @@ const groupBy = function (xs, key) {
   }, {});
 };
 
-const paginator = function (res, page, limit, search, sortBy, order = "desc") {
-  const total = res.length;
-  const paginas = parseInt(total / limit);
-
-  if (order == "desc") {
-    res.sort((a, b) => {
-      return b[sortBy] - a[sortBy];
-    });
-  } else {
-    res.sort((a, b) => {
-      return a[sortBy] - b[sortBy];
-    });
-  }
-  //console.log("resSort", res)
-  const inicio = (page - 1) * limit;
-  const final = page * limit > total ? total : page * limit;
+const pagination = (query, options) => {
   return {
-    totalDocs: final  - inicio,
-    hasNextPage: page >= paginas ? false : true,
-    hasPrevPage: page == 1 ? false : true,
-    page,
-    result: res.slice(inicio, final),
+    docsQuery: `
+      ${query}
+      order by
+	      ${options.sortBy}
+      desc
+      offset ${options.page * options.limit}
+      limit ${options.limit}
+    `,
+    infoQuery: `
+      with
+        query_pagination as (
+          ${query}
+        )
+          select
+            count(*) total
+          from 
+            query_pagination
+    `,
+  };
+};
+
+const executePagination = async (query, options) => {
+  const { docsQuery, infoQuery } = pagination(query, {
+    ...options,
+    page: options.page - 1,
+  });
+
+  const [[results], [[info]]] = await Promise.all([
+    db.query(docsQuery),
+    db.query(infoQuery),
+  ]);
+
+  return {
+    info: {
+      totalDocs: Number(info.total),
+      limit: Number(options.limit ?? 15),
+      page: options.page,
+      totalPages: Math.ceil(info.total / Number(options.limit ?? 15)),
+    },
+    docs: results,
   };
 };
 
 module.exports = {
   groupBy,
-  paginator,
+  executePagination,
+  pagination,
 };

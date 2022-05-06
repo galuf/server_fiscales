@@ -18,7 +18,6 @@ const acusacionesConvocatoria = async (req, res) => {
         i += 1;
       }
     });
-
     res.json({
       success: true,
       results: frecuencias,
