@@ -29,6 +29,22 @@ const query = {
   from presuntos_ubicacion_unicos 
   group by departamento, provincia, distrito
   order by conteo_lugar desc;`,
+  getMemberBySearch: ({ sortBy, search }) => {
+    return `select
+      dni,
+      ${sortBy},
+      fullname,
+      count(*) total_${sortBy}
+    from
+      public.presuntos_responsables
+    where 
+      ${sortBy} = true and 
+      lower(fullname) ~ lower('${search}')
+    group by
+      dni,
+      ${sortBy},
+      fullname`
+  }
 };
 
 module.exports = {
