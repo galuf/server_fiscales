@@ -29,6 +29,47 @@ const query = {
   from presuntos_ubicacion_unicos 
   group by departamento, provincia, distrito
   order by conteo_lugar desc;`,
+  sobrecarga: `with sobrecarga_comite_anual as (
+    select 
+    miembro_comite, year_convocatoria, count(*) conteo_convocatorias from public.miembros_comite_seleccion mcs 
+    group by miembro_comite, year_convocatoria
+  ), presuntos_anual_total as (
+    select pr.fullname, pr.civil, pr.penal, pr.adm_ent, pr.adm_pas, pr.adm,
+    extract(year from ic.fecha_emision) anio_implicado
+    from public.presuntos_responsables pr 
+    left join public.informes_control ic on pr.num_inform = ic.num_inform
+  ), presuntos_unicos_anual as (
+    select fullname, 
+    sum(civil::int) as civil,
+    sum(penal::int) as penal,
+    sum(adm_ent::int) as adm_ent,
+    sum(adm_pas::int) as adm_pas,
+    sum(adm::int) as adm,
+    anio_implicado, count(*) conteo_acusacion
+    from presuntos_anual_total
+    where anio_implicado >= 2018
+    group by fullname,
+    anio_implicado
+  ), miembros_sobrecarga_infoacusacion as (
+    select *
+    from sobrecarga_comite_anual sca
+    full outer join presuntos_unicos_anual pua on sca.miembro_comite = pua.fullname and sca.year_convocatoria = pua.anio_implicado
+  ), clean_miembros_infoacusacion as (
+    select 
+    coalesce(miembro_comite, fullname) nombre_persona_evaluada,
+    coalesce (year_convocatoria, anio_implicado) anio,
+    coalesce (conteo_convocatorias, 0) conteo_convocatorias,
+    coalesce (civil, 0) civil,
+    coalesce (penal, 0) penal,
+    coalesce (adm_ent, 0) adm_ent,
+    coalesce (adm_pas, 0) adm_pas,
+    coalesce (adm, 0) adm,
+    coalesce (conteo_acusacion, 0) conteo_acusacion
+    from miembros_sobrecarga_infoacusacion
+  )
+  select * from clean_miembros_infoacusacion cmi
+  where cmi.nombre_persona_evaluada = 'AMARU LOPEZ BENAVIDES'
+  ;`
 };
 
 module.exports = {
