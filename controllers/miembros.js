@@ -67,7 +67,9 @@ const getMemberBySearch = async (req, res) => {
     if(page <= 0) throw new Error("La página debe ser mayor a 0");
     if(limit <= 0) throw new Error("El limite debe ser mayor a 0");
 
-    const { docs, info } = await executePagination(MiembrosQueries.getMemberBySearch({
+    const queryFunc = sortBy === 'convocatorias' ? MiembrosQueries.getTotalConvocatoriaByMember : MiembrosQueries.getMemberBySearch
+
+    const { docs, info } = await executePagination(queryFunc({
       sortBy,
       search
     }), {
@@ -114,11 +116,16 @@ const getMembersOrderedByNumCom = async (req, res) => {
     sortBy: 'convocatorias',
   })
 
+  const _docs = await resolveMembers(docs.map((doc) => ({
+    ...doc,
+    ['total_convocatorias']: Number(doc['total_convocatorias']),
+  })))
+
   res.json({
     success: true,
     data: {
       info,
-      docs: docs
+      docs: _docs
     }
   })
 
