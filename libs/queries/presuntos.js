@@ -6,7 +6,8 @@ const PresuntosQueries = {
       ic.departamento, 
       ic.provincia, 
       ic.distrito,
-      ic.fecha_emision 
+      ic.fecha_emision,
+      ic.url_resumen 
     from 
       public.presuntos_responsables pr left join 
       public.informes_control ic 
