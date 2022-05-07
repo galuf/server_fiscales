@@ -60,7 +60,7 @@ const MiembrosQueries = {
     `
   },
   getTotalConvocatoriaByMember:({search}) => {
-    return `select fullname, sum(prcc.tiene_convocatoria) as total_convocatorias from (select prc.fullname, CASE WHEN prc.codigo_convocatoria IS NULL THEN 0 ELSE 1 end  as tiene_convocatoria from (
+    return `select fullname, sum(prcc.tiene_convocatoria) as convocatorias from (select prc.fullname, CASE WHEN prc.codigo_convocatoria IS NULL THEN 0 ELSE 1 end  as tiene_convocatoria from (
       select * from (select distinct pr.fullname 
               from presuntos_responsables pr 
               where lower(pr.fullname) ~ lower('${search}')) pru
