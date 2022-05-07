@@ -24,7 +24,7 @@ const resolveConvocatorias = async (convocatorias) => {
     }))
 }
 
-const resolveMembers = async (members) => {
+const resolveMembers = async (members, options) => {
   const queryConvocatorias = ConvocatoriasQueries.convocatoriaBasicByMemberNames(members.map((member) => member.fullname));
   const queryPresuntos = PresuntosQueries.presuntosByNames(members.map((member) => member.fullname))
 
@@ -44,7 +44,7 @@ const resolveMembers = async (members) => {
 
     return ({
       ...member,
-      convocatorias: (convocatoriaResultsGroupBy[member.fullname] ?? []).slice(0, 12),
+      convocatorias: options.full ? (convocatoriaResultsGroupBy[member.fullname] ?? []) : (convocatoriaResultsGroupBy[member.fullname] ?? []).slice(0, 12),
       totalConvocatorias: convocatoriaResultsGroupBy[member.fullname]?.length ?? 0,
       presuntos: presuntosGroupBy[member.fullname] ?? [],
       irregulars: irregulars.reduce((acc, irregularKey) => {
@@ -138,7 +138,35 @@ const getMembersOrderedByNumCom = async (req, res) => {
   }
 }
 
+const getMemberByDni = async (req, res) => {
+  try {
+    if(!req.params?.dni) throw new Error("El dni es requerido");
+
+    const dni = req.params.dni
+
+    const [results] = await db.query(MiembrosQueries.getMemberByDni({
+      dni
+    }))
+
+    const docs = await resolveMembers(results, {
+      full: true
+    })
+
+    res.json({
+      success: true,
+      data: docs[0]
+    })
+  } catch (error) {
+    console.log("Hubo un error: ", error);
+    res.status(500).json({
+      succes: false,
+      msg: "Hable con el administrador",
+    });
+  }
+}
+
 module.exports = {
   getMemberBySearch,
-  getMembersOrderedByNumCom
+  getMembersOrderedByNumCom,
+  getMemberByDni
 };

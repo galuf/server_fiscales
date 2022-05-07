@@ -24,7 +24,19 @@ const MiembrosQueries = {
               on mc.miembro_comite  = pru.fullname) prc) prcc 
               group by prcc.fullname
           `
-  }
+  },
+  getMemberByDni: ({ dni }) => {
+    return `select
+      dni,
+      fullname
+    from
+      public.presuntos_responsables
+    where 
+      dni = '${dni}'
+    group by
+      dni,
+      fullname`;
+  },
 }
 
 
