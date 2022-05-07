@@ -6,6 +6,8 @@ const { groupBy } = require("../libs/helper");
 const { keyBy } = require("lodash");
 const PresuntosQueries = require("../libs/queries/presuntos");
 
+const irregulars = [ "civil", "penal", "adm_ent", "adm_pas", "adm"]
+
 const resolveConvocatorias = async (convocatorias) => {
   const convocatoriaIds = convocatorias.map((convocatoria) => convocatoria.codigo_convocatoria);
 
@@ -15,13 +17,12 @@ const resolveConvocatorias = async (convocatorias) => {
 
   const convocatoriaBy = keyBy(convocatoriaResults, 'codigo_convocatoria')
 
-  return convocatorias.map((convocatoria) => ({
-    ...convocatoria,
-    ...convocatoriaBy[convocatoria.codigo_convocatoria]
-  }))
+  return convocatorias
+    .map((convocatoria) => ({
+      ...convocatoria,
+      ...convocatoriaBy[convocatoria.codigo_convocatoria]
+    }))
 }
-
-const irregulars = [ "civil", "penal", "adm_ent", "adm_pas", "adm"]
 
 const resolveMembers = async (members) => {
   const queryConvocatorias = ConvocatoriasQueries.convocatoriaBasicByMemberNames(members.map((member) => member.fullname));
@@ -43,7 +44,7 @@ const resolveMembers = async (members) => {
 
     return ({
       ...member,
-      convocatorias: convocatoriaResultsGroupBy[member.fullname] ?? [],
+      convocatorias: (convocatoriaResultsGroupBy[member.fullname] ?? []).slice(0, 12),
       totalConvocatorias: convocatoriaResultsGroupBy[member.fullname]?.length ?? 0,
       presuntos: presuntosGroupBy[member.fullname] ?? [],
       irregulars: irregulars.reduce((acc, irregularKey) => {
