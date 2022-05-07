@@ -9,7 +9,7 @@ const PresuntosQueries = {
       ic.fecha_emision,
       ic.url_resumen,
       ic.url_informe,
-      ic.titulo 
+      UPPER(ic.titulo) as titulo
     from 
       public.presuntos_responsables pr left join 
       public.informes_control ic 
