@@ -5,7 +5,7 @@ const pagination = (query, options) => {
     docsQuery: `
       ${query}
       order by
-	      total_${options.sortBy}
+	      ${options.sortBy}
       desc
       offset ${options.page * options.limit}
       limit ${options.limit}

@@ -62,15 +62,14 @@ const getMemberBySearch = async (req, res) => {
     const page = req.query?.page ? Number(req.query.page) : 1;
     const limit = req.query?.limit ? Number(req.query.limit) : 15;
     const sortBy = req.query?.sortBy ? req.query.sortBy : "penal";
-    const search = req.query?.search ? req.query.search : "";
+    const search = (req.query?.search ? req.query.search : "").trim();
 
     if(page <= 0) throw new Error("La página debe ser mayor a 0");
     if(limit <= 0) throw new Error("El limite debe ser mayor a 0");
 
-    const queryFunc = sortBy === 'convocatorias' ? MiembrosQueries.getTotalConvocatoriaByMember : MiembrosQueries.getMemberBySearch
+    const queryFunc = sortBy === 'convocatorias' ? MiembrosQueries.getTotalConvocatoriaByMember : MiembrosQueries.getMemberBySearchComplete
 
     const { docs, info } = await executePagination(queryFunc({
-      sortBy,
       search
     }), {
       page,
