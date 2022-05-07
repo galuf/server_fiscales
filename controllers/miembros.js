@@ -44,7 +44,7 @@ const resolveMembers = async (members, options) => {
 
     return ({
       ...member,
-      convocatorias: options.full ? (convocatoriaResultsGroupBy[member.fullname] ?? []) : (convocatoriaResultsGroupBy[member.fullname] ?? []).slice(0, 12),
+      convocatorias: options?.full ? (convocatoriaResultsGroupBy[member.fullname] ?? []) : (convocatoriaResultsGroupBy[member.fullname] ?? []).slice(0, 12),
       totalConvocatorias: convocatoriaResultsGroupBy[member.fullname]?.length ?? 0,
       presuntos: presuntosGroupBy[member.fullname] ?? [],
       irregulars: irregulars.reduce((acc, irregularKey) => {
